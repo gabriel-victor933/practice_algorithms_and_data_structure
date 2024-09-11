@@ -520,7 +520,7 @@ function intersection(nums1: number[], nums2: number[]): number[] {
     return Object.values(hashRes)
 };
 
-const randomList = [7,4,6,18,5,62,9,8,3]
+const randomList = [1,7,4,6,18,5,62,9,8,3]
 
 function bubbleSort(lists: number[]){
 
@@ -589,3 +589,233 @@ console.time('insertionSort')
 const list3 = insertionSort([...randomList])
 console.log(list3)
 console.timeEnd('insertionSort')
+
+function mergeSort(list: number[]): number[]{
+    if(list.length <= 1) return list
+
+    const middle = Math.floor(list.length/2)
+
+    const left = mergeSort(list.slice(0,middle))
+    const right = mergeSort(list.slice(middle,list.length))
+
+    return merge(left,right)
+}
+
+function merge(left: number[], right: number[]){
+
+    let i = 0
+    let j = 0
+    const result: number[] = []
+    while(i < left.length && j < right.length){
+        const least = left[i] < right[j] ? left[i++] : right[j++]
+        result.push(least)
+    }
+
+    return result.concat(i < left.length ? left.slice(i) : right.slice(j))
+}
+
+console.time('mergeSort')
+const list4 = mergeSort([...randomList])
+console.log(list4)
+console.timeEnd('mergeSort')
+
+function quicksort(list: number[]){
+    return quick(list,0,list.length-1)
+}
+
+function quick(list: number[], left: number, right: number){
+    if(list.length <= 1) return list
+
+    let index = partition(list,left,right)
+
+    if(left < index -1){
+        quick(list,left,index-1)
+    }
+
+    if(right > index){
+        quick(list,index,right)
+    }
+
+    return list
+}
+
+function partition(list: number[], left: number, right: number): number{
+    const pivot = list[Math.floor((left + right)/2)]
+    let i = left
+    let j = right
+
+    while(i <= j){
+        while(list[i] < pivot){
+            i++
+        }
+
+        while(list[j] > pivot){
+            j--
+        }
+
+        if(i <= j){
+            const temp = list[i]
+            list[i] = list[j]
+            list[j] = temp
+
+            i++
+            j--
+        }
+    }
+
+    return i
+}
+
+console.time('quickSort')
+const list5 = quicksort([3,5,1,6,4,7,2])
+console.log(list5)
+console.timeEnd('quickSort')
+
+function countingSort(list: number[]){
+    if(list.length < 2) return list
+
+    const maxValue = findMaxValue(list)
+    console.log(maxValue)
+    const counts = new Array(maxValue+1)
+
+    list.forEach((ele) => {
+        if(!counts[ele]){
+            counts[ele] = 0
+        }
+        counts[ele] += 1
+    })
+
+    let sortedIndex = 0
+
+    counts.forEach((count,i) => {
+        while(count > 0){
+            list[sortedIndex++] = i
+            count--
+        }
+    })
+
+    return list
+}
+
+function findMaxValue(list: number[]){
+    let max = -Infinity
+    for(let i = 0; i < list.length; i++){
+        if(list[i] > max) max = list[i]
+    }
+    return max
+}
+
+function findMinValue(list: number[]){
+    let min = Infinity
+    for(let i = 0; i < list.length; i++){
+        if(list[i] < min) min = list[i]
+    }
+    return min
+}
+
+console.time('countingSort')
+const list6 = countingSort([...randomList])
+console.log(list6)
+console.timeEnd('countingSort')
+
+function bucketSort(list: number[], bucketSize = 5){
+    if(list.length <= 1) return list
+
+    const buckets = createBuckets(list,bucketSize)
+    return sortBuckets(buckets)
+}
+
+function createBuckets(list: number[], bucketSize: number){
+    let minValue = list[0]
+    let maxValue = list[0]
+
+    for(let i = 1; i < list.length; i++){
+        if(list[i] < minValue){
+            minValue = list[i]
+        }
+        if(list[i] > maxValue){
+            maxValue = list[i]
+        }
+    }
+
+    const bucketCount = Math.floor((maxValue - minValue)/bucketSize)+1
+
+    const buckets: number[][] = []
+    for(let i = 0; i < bucketCount; i++){
+        buckets[i] = []
+    }
+
+    for(let i = 0; i < list.length; i++){
+        const bucketIndex = Math.floor((list[i] - minValue)/bucketSize)
+        buckets[bucketIndex].push(list[i])
+    }
+    return buckets
+}
+
+function sortBuckets(buckets: number[][]){
+    const sortedArray: number[] = []
+
+    for(let i = 0; i < buckets.length; i++){
+        if(buckets[i] != null){
+            insertionSort(buckets[i])
+        }
+        sortedArray.push(...buckets[i])
+    }
+
+    return sortedArray
+}
+
+console.time('bucketSort')
+const list7 = bucketSort([...randomList],3)
+console.log(list7)
+console.timeEnd('bucketSort')
+
+function radixSort(list: number[], radixBase=10){
+    if(list.length <= 1) return list
+
+    const maxValue = findMaxValue(list)
+    const minValue = findMinValue(list)
+
+    let significantDigit = 1
+
+    while((maxValue - minValue)/significantDigit >= 1){
+        list = countingSortForRadix(list,radixBase,significantDigit,minValue)
+        significantDigit *= radixBase
+    }
+
+    return list
+}
+
+function countingSortForRadix(list: number[], radixBase: number, significantDigit: number, minValue: number){
+    let bucketIndex;
+    const buckets: number[] = []
+    const aux: number[] = []
+
+    for(let i = 0; i < radixBase; i++){
+        buckets[i] = 0
+    }
+
+    for(let i = 0; i < list.length; i++){
+        bucketIndex = Math.floor(((list[i] - minValue)/significantDigit)%radixBase)
+        buckets[bucketIndex]++
+    }
+
+    for(let i = 1; i < radixBase; i++){
+        buckets[i] += buckets[i-1]
+    }
+
+    for(let i = list.length -1; i >= 0; i--){
+        bucketIndex = Math.floor(((list[i] - minValue)/significantDigit)%radixBase)
+        aux[--buckets[bucketIndex]] = list[i]
+    }
+
+    for(let i =0; i < list.length; i++){
+        list[i] = aux[i]
+    }
+    return list
+}
+
+console.time('radixSort')
+const list8 = radixSort([...randomList],3)
+console.log(list8)
+console.timeEnd('radixSort')
