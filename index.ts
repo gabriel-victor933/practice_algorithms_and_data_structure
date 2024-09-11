@@ -520,7 +520,7 @@ function intersection(nums1: number[], nums2: number[]): number[] {
     return Object.values(hashRes)
 };
 
-const randomList = [1,7,4,6,18,5,62,9,8,3]
+const randomList = [7,4,6,18,5,62,9,8,3]
 
 function bubbleSort(lists: number[]){
 
@@ -539,7 +539,7 @@ function bubbleSort(lists: number[]){
 }
 
 console.time('bubbleSort')
-const list = bubbleSort(randomList)
+const list = bubbleSort([...randomList])
 console.log(list)
 console.timeEnd('bubbleSort')
 
@@ -565,8 +565,27 @@ function selectionSort(list: number[]) {
 }
 
 console.time('selectionSort')
-const list2 = selectionSort(randomList)
+const list2 = selectionSort([...randomList])
 console.log(list2)
 console.timeEnd('selectionSort')
 
-function insertionSort(list: number[])
+function insertionSort(list: number[]){
+
+    for (let i = 1; i < list.length; i++) {
+        for(let j = i; j > 0; j--){
+            if(list[j-1] <= list[j]) break
+
+            const temp = list[j-1]
+            list[j-1] = list[j]
+            list[j] = temp
+        }
+        
+    }
+
+    return list
+}
+
+console.time('insertionSort')
+const list3 = insertionSort([...randomList])
+console.log(list3)
+console.timeEnd('insertionSort')
