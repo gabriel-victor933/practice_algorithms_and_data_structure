@@ -619,7 +619,7 @@ const list4 = mergeSort([...randomList])
 console.log(list4)
 console.timeEnd('mergeSort')
 
-function quicksort(list: number[]){
+/* function quicksort(list: number[]){
     return quick(list,0,list.length-1)
 }
 
@@ -664,12 +664,12 @@ function partition(list: number[], left: number, right: number): number{
     }
 
     return i
-}
+} */
 
-console.time('quickSort')
+/* console.time('quickSort')
 const list5 = quicksort([3,5,1,6,4,7,2])
 console.log(list5)
-console.timeEnd('quickSort')
+console.timeEnd('quickSort') */
 
 function countingSort(list: number[]){
     if(list.length < 2) return list
@@ -819,3 +819,217 @@ console.time('radixSort')
 const list8 = radixSort([...randomList],3)
 console.log(list8)
 console.timeEnd('radixSort')
+
+function binarySearch(list: number[], search: number){
+
+    let middle = Math.floor(list.length/2)
+    let min = 0
+    let max = list.length
+
+    while(min <= max){
+
+        if(list[middle] == search){
+            return middle
+        }
+
+        if(search > list[middle]){
+            min = middle + 1
+        }
+
+        if(search < list[middle]){
+            max = middle - 1
+
+        }
+
+        middle = Math.floor((max + min)/2)
+    }
+
+    return -1
+}   
+
+console.time('BinarySearch')
+console.log(binarySearch([1,2,3,4,5,6,7,8],6))
+console.timeEnd('BinarySearch')
+
+function interpolationSearch(list: number[], search: number){
+    let low = 0
+    let high = list.length - 1
+
+    while(low <= high && search >= list[low] && search <= list[high]){
+        let delta = (search - list[low])/(list[high] - list[low])
+        let position = low + Math.floor((high - low)*delta)
+        if(list[position] == search){
+            return position
+        }
+
+        if(list[position] < search){
+            low = position + 1
+        } else {
+            high = position - 1
+        }
+    }
+
+    return -1
+}   
+
+console.time('interpolationSearch')
+console.log(interpolationSearch([1,2,3,4,5,6,7,8],6))
+console.timeEnd('interpolationSearch')
+
+
+function shuffle(list: number[]){
+    for(let i = list.length -1; i > 0; i-- ){
+        const randomIndex = Math.floor(Math.random()*(i+1))
+        const temp = list[i]
+        list[i] = list[randomIndex]
+        list[randomIndex] = temp
+    }
+    return list
+}
+
+console.log(shuffle([1,2,3,4,5,6,7,8,9,10]))
+
+
+function minimumAverage(nums: number[]): number {
+  
+    const sortedArray = quickSort(nums)
+    
+    let minAverage: number = +Infinity
+
+    for(let i = 0; i < sortedArray.length/2; i++){
+        const average = (sortedArray[i] + sortedArray[sortedArray.length - 1 - i])/2
+
+        if(average < minAverage) minAverage = average
+    }
+
+    return minAverage
+};
+
+function quickSort(list: number[]){
+    return quick(list, 0, list.length -1)
+}
+
+function quick(list: number[], left: number, right: number){
+    if(list.length <= 1) return list
+    
+    const index = partition(list,left, right)
+
+    if(left < index -1){
+        quick(list,left,index-1)
+    }
+
+    if(right > index){
+        quick(list,index,right)
+    }
+
+
+    return list
+}
+
+
+function partition(list: number[], left: number, right: number){
+
+    const pivot = list[Math.floor((right + left)/2)]
+    let i = left
+    let j = right
+
+    while(i <= j){
+
+        while(list[i] < pivot){
+            i++
+        }
+
+        while(list[j] > pivot){
+            j--
+        }
+
+        if(i <= j){
+
+            let temp = list[i]
+            list[i] = list[j]
+            list[j] = temp
+
+            i++
+            j--
+        }
+    }
+
+    return i
+}
+
+console.log('Minimum Average')
+console.log(minimumAverage([7,8,3,4,15,13,4,1]))
+
+function minimumBoxes(apple: number[], capacity: number[]): number {
+    const sortedCapacity = capacity.sort((a,b) => b-a)
+    let totalApples = apple.reduce((acc,cur) => cur + acc,0)
+    let usedBoxes = 0
+    
+    while(totalApples > 0){
+        totalApples -= sortedCapacity[usedBoxes]
+        usedBoxes++
+    }
+    return usedBoxes
+};
+
+console.log('minimumBoxes')
+console.log(minimumBoxes([1,3,2], [4,3,1,5,2]))
+console.log(minimumBoxes([5,5,5], [2,4,2,7]))
+
+function minimumCost(nums: number[]): number {
+    //achar os 3 menores valores 
+
+    const least = new Array(nums[0],Infinity,Infinity)
+
+    least[0] = nums[0]
+
+    for(let i = 1; i < nums.length; i++){
+
+        if(nums[i] < least[1]){
+            let temp = least[1]
+            least[1] = nums[i]
+
+            if(temp < least[2]) least[2] = temp
+            continue
+        }
+
+        if(nums[i] < least[2]) least[2] = nums[i]
+    }
+    
+    return least.reduce((acc,cur) => acc + cur,0)
+};
+
+console.log('minimumCost')
+console.log(minimumCost([1,6,49,35,41,4,31,39,36,39]))
+
+function missingInteger(nums: number[]): number {
+    
+    let aux = [nums[0]]
+    let max = 0
+    let longest = [nums[0]]
+
+    for(let i = 1; i < nums.length; i++){
+        if(nums[i] === nums[i-1] + 1){
+            aux.push(nums[i])
+
+            if(max < aux.length) {
+                max = aux.length
+                longest = [...aux]
+            }
+        } else {
+            break
+        }
+    }
+    
+    let missing = longest.reduce((acc,cur) => acc + cur, 0)
+    
+    while(nums.includes(missing)) missing++
+
+    return missing
+};
+
+console.log('missingInteger')
+console.log(missingInteger([1,2,3,2,5]))
+console.log(missingInteger([3,4,5,1,12,14,13]))
+console.log(missingInteger([38]))
+console.log(missingInteger([37,1,2,9,5,8,5,2,9,4]))
